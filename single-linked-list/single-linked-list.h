@@ -146,6 +146,7 @@ public:
         BasicIterator& operator++() noexcept
         {
             // Реализуйте оператор самостоятельно
+            assert(node_ != nullptr);
             node_ = node_->next_node;
             return *this;
         }
@@ -172,6 +173,7 @@ public:
         [[nodiscard]] reference operator*() const noexcept
         {
             // Реализуйте оператор самостоятельно
+            assert(node_ != nullptr);
             return node_->value;
         }
 
@@ -181,6 +183,7 @@ public:
         [[nodiscard]] pointer operator->() const noexcept
         {
             // Реализуйте оператор самостоятельно
+            assert(node_ != nullptr);
             return &(node_->value);
         }
     };
@@ -318,6 +321,9 @@ public:
     {
         // Реализуйте метод самостоятельно
 
+        // Если элемента pos.node_ не существует - это серьезная ошибка, не продолжаем
+        assert(pos.node_ != nullptr_t);
+
         // Создаем неконстантный итератор на основе знаний класса friend SingleLinkedList об устройстве BasicIterator
         Iterator it(pos.node_);
         // Создаем новый узел, передавая ему адрес следующего за pos узла
@@ -332,14 +338,17 @@ public:
     {
         //Реализуйте метод самостоятельно
 
-        // Можно не проверять по условиям задания
-        if (head_.next_node == nullptr)
+        // Если список пуст, просто выходим
+        if (IsEmpty())
         {
             return;
         }
+        // Список НЕ пуст. head_.next_node ДОЛЖЕН указывать на элемент
+        assert(head_.next_node != nullptr);
 
         Node* new_next_node_ptr = (head_.next_node)->next_node;
         delete head_.next_node;
+        --size_;
         head_.next_node = new_next_node_ptr;
     }
 
@@ -349,9 +358,10 @@ public:
     {
         //Реализуйте метод самостоятельно
 
-        // Проверки не требуются по условиям задания
-        if (pos.node_->next_node == nullptr)
+        // Если список пуст ИЛИ pos не указывает на элемент ИЛИ нечего удалять после pos
+        if ((IsEmpty()) || (pos.node_ == nullptr) || (pos.node_->next_node == nullptr))
         {
+            // Возвращаем итератор end()
             return end();
         }
 
